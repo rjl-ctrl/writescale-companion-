@@ -168,16 +168,15 @@
 const EMAILJS_PUBLIC_KEY  = 'vP-0hFOV4U2gTSOxm';
 const EMAILJS_SERVICE_ID  = 'service_3fxdymu';
 const EMAILJS_TEMPLATE_ID = 'tmnu10p';
-const ANTHROPIC_KEY = 'ANTHROPIC_KEY_PLACEHOLDER';
 
 emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
 const DIMS = [
-  { key: 'narrative_identity',      label: 'Narrative identity',       cite: 'McAdams (2001) — scholarly self-construction through narrative' },
-  { key: 'reflective_practice',     label: 'Reflective practice',      cite: 'Schön (1983) — structured reflection on experience' },
-  { key: 'transformative_reasoning',label: 'Transformative reasoning', cite: 'Mezirow (1991) — perspective shifts and meaning-making' },
-  { key: 'metacognitive_clarity',   label: 'Metacognitive clarity',    cite: 'Flavell (1979); Zimmerman (2002) — self-regulated scholarly thinking' },
-  { key: 'scholarly_voice',         label: 'Scholarly voice',          cite: 'Hyland (2002); Ivanič (1998) — academic register and disciplinary positioning' }
+  { key: 'narrative_identity',       label: 'Narrative identity',       cite: 'McAdams (2001) — scholarly self-construction through narrative' },
+  { key: 'reflective_practice',      label: 'Reflective practice',      cite: 'Schön (1983) — structured reflection on experience' },
+  { key: 'transformative_reasoning', label: 'Transformative reasoning', cite: 'Mezirow (1991) — perspective shifts and meaning-making' },
+  { key: 'metacognitive_clarity',    label: 'Metacognitive clarity',    cite: 'Flavell (1979); Zimmerman (2002) — self-regulated scholarly thinking' },
+  { key: 'scholarly_voice',          label: 'Scholarly voice',          cite: 'Hyland (2002); Ivanič (1998) — academic register and disciplinary positioning' }
 ];
 
 let sd = {};
@@ -214,22 +213,14 @@ function updateCount() {
 }
 
 async function callClaude(system, user) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('/api/claude', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: system,
-      messages: [{ role: 'user', content: user }]
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ system, user })
   });
   const data = await res.json();
-  return data.content[0].text;
+  if (!res.ok) throw new Error(data.error || 'API error');
+  return data.text;
 }
 
 async function startSession() {
@@ -302,24 +293,24 @@ async function sendEmail(r) {
   const feedbackLines = DIMS.map(d => `${d.label}: ${r[d.key].feedback}`).join('\n\n');
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      student_name:        sd.name,
-      session_id:          sd.sessionId,
-      specialization:      sd.spec,
-      stage:               sd.stage,
-      prompt:              sd.prompt,
-      student_response:    sd.response,
-      score_narrative:     r.narrative_identity.score,
-      band_narrative:      r.narrative_identity.band,
-      score_reflective:    r.reflective_practice.score,
-      band_reflective:     r.reflective_practice.band,
-      score_transformative:r.transformative_reasoning.score,
-      band_transformative: r.transformative_reasoning.band,
-      score_metacognitive: r.metacognitive_clarity.score,
-      band_metacognitive:  r.metacognitive_clarity.band,
-      score_voice:         r.scholarly_voice.score,
-      band_voice:          r.scholarly_voice.band,
-      score_composite:     sd.composite,
-      feedback_summary:    r.overall_narrative + '\n\n' + feedbackLines
+      student_name:         sd.name,
+      session_id:           sd.sessionId,
+      specialization:       sd.spec,
+      stage:                sd.stage,
+      prompt:               sd.prompt,
+      student_response:     sd.response,
+      score_narrative:      r.narrative_identity.score,
+      band_narrative:       r.narrative_identity.band,
+      score_reflective:     r.reflective_practice.score,
+      band_reflective:      r.reflective_practice.band,
+      score_transformative: r.transformative_reasoning.score,
+      band_transformative:  r.transformative_reasoning.band,
+      score_metacognitive:  r.metacognitive_clarity.score,
+      band_metacognitive:   r.metacognitive_clarity.band,
+      score_voice:          r.scholarly_voice.score,
+      band_voice:           r.scholarly_voice.band,
+      score_composite:      sd.composite,
+      feedback_summary:     r.overall_narrative + '\n\n' + feedbackLines
     });
     document.getElementById('email-status').innerHTML = '<div class="email-ok">✓ Research record logged successfully.</div>';
   } catch(e) {
