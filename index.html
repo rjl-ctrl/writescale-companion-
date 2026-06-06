@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Doctoral WriteScale Companion</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f9; color: #1a1a1a; min-height: 100vh; }
+  .page { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .ws-title { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .ws-sub { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 2rem; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .progress { display: flex; gap: 6px; margin-bottom: 2rem; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #ddd; }
+  .dot.active { background: #888; }
+  .dot.done { background: #1a1a1a; }
+  .card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; }
+  .card-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #1a1a1a; }
+  .consent-body { font-size: 13px; color: #555; line-height: 1.75; }
+  .consent-body p { margin-bottom: 10px; }
+  .consent-body p:last-child { margin-bottom: 0; }
+  .check-row { display: flex; align-items: flex-start; gap: 10px; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid #eee; }
+  .check-row input { margin-top: 3px; flex-shrink: 0; width: 15px; height: 15px; cursor: pointer; }
+  .check-row label { font-size: 13px; line-height: 1.5; cursor: pointer; }
+  .field-group { margin-bottom: 1.25rem; }
+  .field-label { font-size: 13px; color: #555; margin-bottom: 6px; display: block; }
+  .field-note { font-size: 11px; color: #999; margin-bottom: 6px; display: block; }
+  input[type="text"], select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 14px; color: #1a1a1a; background: #fff; outline: none; transition: border-color 0.15s; }
+  input[type="text"]:focus, select:focus, textarea:focus { border-color: #999; }
+  textarea { resize: vertical; min-height: 200px; line-height: 1.7; }
+  .btn-primary { background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 11px 26px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-secondary { background: transparent; color: #1a1a1a; border: 1px solid #ddd; border-radius: 8px; padding: 11px 26px; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .btn-secondary:hover { border-color: #999; }
+  .action-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 1.25rem; }
+  .status-bar { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #666; margin-top: 1rem; }
+  .spinner { width: 16px; height: 16px; border: 2px solid #ddd; border-top-color: #666; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .prompt-eyebrow { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #999; margin-bottom: 10px; }
+  .prompt-text { font-size: 15px; line-height: 1.7; color: #1a1a1a; }
+  .rubric-note { font-size: 13px; color: #666; background: #f5f5f5; border-radius: 8px; padding: 10px 14px; margin-bottom: 1.25rem; line-height: 1.6; }
+  .char-count { font-size: 12px; color: #aaa; text-align: right; margin-top: 5px; }
+  .overall-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .overall-num { font-size: 42px; font-weight: 600; }
+  .overall-denom { font-size: 18px; color: #888; }
+  .overall-label { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+  .dim-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .dim-card { background: #f5f5f5; border-radius: 10px; padding: 1rem; }
+  .dim-card.wide { grid-column: 1 / -1; }
+  .dim-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .dim-name { font-size: 13px; font-weight: 500; }
+  .dim-score { font-size: 22px; font-weight: 600; }
+  .dim-denom { font-size: 13px; color: #aaa; }
+  .dim-band { font-size: 11px; color: #777; margin-bottom: 3px; }
+  .dim-cite { font-size: 11px; color: #aaa; font-style: italic; line-height: 1.4; }
+  .feedback-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 10px; }
+  .fb-title { font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
+  .fb-cite { font-size: 11px; color: #aaa; font-style: italic; margin-bottom: 8px; line-height: 1.4; }
+  .fb-text { font-size: 15px; color: #1a1a1a; line-height: 1.75; }
+  .session-tag { font-size: 12px; color: #aaa; margin-bottom: 6px; font-family: monospace; }
+  .email-notice { font-size: 12px; color: #aaa; margin-top: 8px; }
+  .email-ok { font-size: 13px; color: #555; background: #f0f7f0; border-radius: 8px; padding: 8px 12px; margin-top: 10px; border: 1px solid #d0e8d0; }
+  @media (max-width: 500px) { .dim-grid { grid-template-columns: 1fr; } .dim-card.wide { grid-column: 1; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="ws-title">Doctoral WriteScale Companion</div>
+  <div class="ws-sub">A formative writing assessment for early doctoral scholars. No account required.</div>
+
+  <div class="progress" id="progress">
+    <div class="dot active" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+  </div>
+
+  <!-- STEP 1: CONSENT -->
+  <div class="step active" id="step-consent">
+    <div class="card">
+      <div class="card-title">Informed Consent — Research Participation Notice</div>
+      <div class="consent-body">
+        <p>This assessment is part of a research study examining doctoral writing development. Your participation is entirely voluntary. You may withdraw at any time without consequence.</p>
+        <p>All data collected through this assessment will be fully confidentialized. Your name will not appear in any research findings, publications, or presentations. Responses are assigned an anonymous session code for analysis purposes. Program area and stage of study are collected only to contextualize patterns across cohorts and will never be linked to your identity in any reported findings.</p>
+        <p>If you choose to participate, your written response and assessment scores may be used for scholarly research purposes under these confidentiality protections.</p>
+        <p>This study is conducted by Dr. Rodney Luster, University Research Chair, Center for Leadership and Entrepreneurial Research (CLER), University of Phoenix.</p>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="consent-check" onchange="toggleConsent()" />
+        <label for="consent-check">I have read the above notice and voluntarily agree to participate in this research study.</label>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn-primary" id="btn-consent" onclick="goIntake()" disabled>Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: INTAKE -->
+  <div class="step" id="step-intake">
+    <div class="field-group">
+      <label class="field-label" for="f-name">Your first name</label>
+      <span class="field-note">Used for your session experience only — not recorded in research data</span>
+      <input type="text" id="f-name" placeholder="e.g. Jordan" />
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="f-spec">Doctoral specialization or program area</label>
+      <input type="text" id="f-spec" placeholder="e.g. Organizational Leadership, Educational Psychology..." />
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="f-stage">Where are you in your doctoral journey?</label>
+      <select id="f-stage">
+        <option value="just starting">Just starting — first or second course</option>
+        <option value="mid-program">Mid-program — working toward candidacy</option>
+        <option value="dissertation phase">Dissertation phase — problem statement work</option>
+      </select>
+    </div>
+    <div class="action-row">
+      <button class="btn-primary" id="btn-start" onclick="startSession()">Begin assessment</button>
+    </div>
+    <div class="status-bar" id="status-intake" style="display:none;">
+      <div class="spinner"></div>
+      <span>Generating your prompt...</span>
+    </div>
+  </div>
+
+  <!-- STEP 3: WRITING -->
+  <div class="step" id="step-writing">
+    <div class="card">
+      <div class="prompt-eyebrow">your writing prompt</div>
+      <div class="prompt-text" id="prompt-text"></div>
+    </div>
+    <div class="rubric-note">Write at least 150 words. There are no right or wrong answers — this assessment evaluates how you write, not what you know. Write as you naturally would in a scholarly paper.</div>
+    <div class="field-group">
+      <label class="field-label" for="f-response">Your response</label>
+      <textarea id="f-response" placeholder="Begin writing here..." oninput="updateCount()"></textarea>
+      <div class="char-count" id="char-count">0 words</div>
+    </div>
+    <div class="action-row">
+      <button class="btn-primary" id="btn-submit" onclick="submitResponse()" disabled>Submit for feedback</button>
+    </div>
+    <div class="status-bar" id="status-writing" style="display:none;">
+      <div class="spinner"></div>
+      <span>Analyzing your writing across five dimensions...</span>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESULTS -->
+  <div class="step" id="step-results">
+    <div class="session-tag" id="session-tag"></div>
+    <div class="overall-row">
+      <span class="overall-num" id="overall-num">—</span>
+      <span class="overall-denom">/ 5 avg</span>
+    </div>
+    <div class="overall-label">Composite WriteScale score</div>
+    <div class="dim-grid" id="dim-grid"></div>
+    <div id="feedback-sections"></div>
+    <div id="email-status"></div>
+    <div class="action-row" style="margin-top:1.5rem;">
+      <button class="btn-secondary" onclick="resetSession()">Start over</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EMAILJS_PUBLIC_KEY  = 'vP-0hFOV4U2gTSOxm';
+const EMAILJS_SERVICE_ID  = 'service_3fxdymu';
+const EMAILJS_TEMPLATE_ID = 'tmnu10p';
+const ANTHROPIC_KEY = 'ANTHROPIC_KEY_PLACEHOLDER';
+
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+const DIMS = [
+  { key: 'narrative_identity',      label: 'Narrative identity',       cite: 'McAdams (2001) — scholarly self-construction through narrative' },
+  { key: 'reflective_practice',     label: 'Reflective practice',      cite: 'Schön (1983) — structured reflection on experience' },
+  { key: 'transformative_reasoning',label: 'Transformative reasoning', cite: 'Mezirow (1991) — perspective shifts and meaning-making' },
+  { key: 'metacognitive_clarity',   label: 'Metacognitive clarity',    cite: 'Flavell (1979); Zimmerman (2002) — self-regulated scholarly thinking' },
+  { key: 'scholarly_voice',         label: 'Scholarly voice',          cite: 'Hyland (2002); Ivanič (1998) — academic register and disciplinary positioning' }
+];
+
+let sd = {};
+
+function genId() {
+  return 'WS-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+}
+
+function setProgress(idx) {
+  for (let i = 0; i < 4; i++) {
+    const d = document.getElementById('d' + i);
+    d.className = 'dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  }
+}
+
+function showStep(id, pi) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  setProgress(pi);
+  window.scrollTo(0, 0);
+}
+
+function toggleConsent() {
+  document.getElementById('btn-consent').disabled = !document.getElementById('consent-check').checked;
+}
+
+function goIntake() { showStep('step-intake', 1); }
+
+function updateCount() {
+  const t = document.getElementById('f-response').value.trim();
+  const w = t ? t.split(/\s+/).length : 0;
+  document.getElementById('char-count').textContent = w + ' words';
+  document.getElementById('btn-submit').disabled = w < 100;
+}
+
+async function callClaude(system, user) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+async function startSession() {
+  const name  = document.getElementById('f-name').value.trim();
+  const spec  = document.getElementById('f-spec').value.trim();
+  const stage = document.getElementById('f-stage').value;
+  if (!name || !spec) { alert('Please fill in your name and specialization.'); return; }
+  sd = { name, spec, stage, sessionId: genId() };
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('status-intake').style.display = 'flex';
+  try {
+    const sys = `You are the Doctoral WriteScale Companion. Generate a single metaphor-based writing prompt for a doctoral student. Ask them to explore a concept from their field through a metaphor or analogy, then develop that idea with scholarly language, reflecting on what it reveals about their scholarly identity and how they make meaning. 2-4 sentences. Output only the prompt text.`;
+    sd.prompt = await callClaude(sys, `Specialization: ${spec}. Stage: ${stage}. Name: ${name}.`);
+    document.getElementById('prompt-text').textContent = sd.prompt;
+    showStep('step-writing', 2);
+  } catch(e) {
+    document.getElementById('status-intake').style.display = 'none';
+    document.getElementById('btn-start').disabled = false;
+    alert('Error generating prompt. Please try again.');
+  }
+}
+
+async function submitResponse() {
+  const text = document.getElementById('f-response').value.trim();
+  if (!text) return;
+  sd.response = text;
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('status-writing').style.display = 'flex';
+  try {
+    const dimSpec = DIMS.map(d =>
+      `"${d.key}": { "score": <1-5>, "band": "<Emerging|Developing|Proficient|Advanced|Distinguished>", "feedback": "<2-3 sentences grounded in what they actually wrote, referencing ${d.cite}>" }`
+    ).join(',\n');
+    const sys = `You are a doctoral writing analyst using the WriteScale rubric. Score the student's response on five dimensions (1-5 each). Return ONLY a valid JSON object — no markdown, no preamble:\n{\n${dimSpec},\n"overall_narrative": "<3-4 sentence holistic summary addressing the student by first name, grounded in what they wrote, naming one concrete next step>"\n}`;
+    const raw = await callClaude(sys, `Student: ${sd.name}. Specialization: ${sd.spec}. Stage: ${sd.stage}.\nPrompt: "${sd.prompt}"\nResponse: "${text}"`);
+    const result = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    sd.result = result;
+    renderResults(result);
+    showStep('step-results', 3);
+    sendEmail(result);
+  } catch(e) {
+    document.getElementById('status-writing').style.display = 'none';
+    document.getElementById('btn-submit').disabled = false;
+    alert('Error analyzing response. Please try again.');
+  }
+}
+
+function renderResults(r) {
+  document.getElementById('session-tag').textContent = 'Session ' + sd.sessionId + ' · ' + sd.spec + ' · ' + sd.stage;
+  const avg = (DIMS.reduce((s, d) => s + r[d.key].score, 0) / DIMS.length).toFixed(1);
+  sd.composite = avg;
+  document.getElementById('overall-num').textContent = avg;
+
+  document.getElementById('dim-grid').innerHTML = DIMS.map((d, i) => {
+    const wide = (i === DIMS.length - 1 && DIMS.length % 2 !== 0) ? ' wide' : '';
+    return `<div class="dim-card${wide}">
+      <div class="dim-top"><span class="dim-name">${d.label}</span><span><span class="dim-score">${r[d.key].score}</span><span class="dim-denom">/5</span></span></div>
+      <div class="dim-band">${r[d.key].band}</div>
+      <div class="dim-cite">${d.cite}</div>
+    </div>`;
+  }).join('');
+
+  let fb = `<div class="feedback-card"><div class="fb-title">Holistic summary</div><div class="fb-text">${r.overall_narrative}</div></div>`;
+  DIMS.forEach(d => {
+    fb += `<div class="feedback-card"><div class="fb-title">${d.label}</div><div class="fb-cite">${d.cite}</div><div class="fb-text">${r[d.key].feedback}</div></div>`;
+  });
+  document.getElementById('feedback-sections').innerHTML = fb;
+}
+
+async function sendEmail(r) {
+  const feedbackLines = DIMS.map(d => `${d.label}: ${r[d.key].feedback}`).join('\n\n');
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      student_name:        sd.name,
+      session_id:          sd.sessionId,
+      specialization:      sd.spec,
+      stage:               sd.stage,
+      prompt:              sd.prompt,
+      student_response:    sd.response,
+      score_narrative:     r.narrative_identity.score,
+      band_narrative:      r.narrative_identity.band,
+      score_reflective:    r.reflective_practice.score,
+      band_reflective:     r.reflective_practice.band,
+      score_transformative:r.transformative_reasoning.score,
+      band_transformative: r.transformative_reasoning.band,
+      score_metacognitive: r.metacognitive_clarity.score,
+      band_metacognitive:  r.metacognitive_clarity.band,
+      score_voice:         r.scholarly_voice.score,
+      band_voice:          r.scholarly_voice.band,
+      score_composite:     sd.composite,
+      feedback_summary:    r.overall_narrative + '\n\n' + feedbackLines
+    });
+    document.getElementById('email-status').innerHTML = '<div class="email-ok">✓ Research record logged successfully.</div>';
+  } catch(e) {
+    document.getElementById('email-status').innerHTML = '<div class="email-notice">Research record could not be sent — check EmailJS configuration.</div>';
+  }
+}
+
+function resetSession() {
+  sd = {};
+  ['f-name','f-spec','f-response'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('consent-check').checked = false;
+  document.getElementById('btn-consent').disabled = true;
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('char-count').textContent = '0 words';
+  document.getElementById('status-intake').style.display = 'none';
+  document.getElementById('status-writing').style.display = 'none';
+  document.getElementById('email-status').innerHTML = '';
+  showStep('step-consent', 0);
+}
+</script>
+</body>
+</html>
