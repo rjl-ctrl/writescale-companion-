@@ -120,6 +120,17 @@
   .dim-score { font-size: 22px; font-weight: 600; }
   .dim-denom { font-size: 13px; color: #aaa; }
   .dim-band { font-size: 11px; color: #777; margin-bottom: 3px; }
+ .dim-signal {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.45;
+  margin: 6px 0 7px;
+}
+
+.dim-signal strong {
+  color: #333;
+  font-weight: 700;
+}
   .dim-cite { font-size: 11px; color: #aaa; font-style: italic; line-height: 1.4; }
   .feedback-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 10px; }
   .fb-title { font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px; }
@@ -464,7 +475,48 @@ try {
   alert('Error analyzing response: ' + e.message);
 }
 }
+function getDimensionSignal(key, score) {
+  const signals = {
+    narrative_identity: {
+      1: 'Experience is present, but the writer has not yet shaped it into a scholarly self-understanding.',
+      2: 'The response begins to connect personal meaning with identity development.',
+      3: 'The writer is forming a clearer scholarly narrative with emerging conceptual purpose.',
+      4: 'The response shows a coherent scholarly identity grounded in experience and interpretation.',
+      5: 'The writer demonstrates a mature scholarly self-construction with strong narrative integration.'
+    },
+    reflective_practice: {
+      1: 'Reflection remains mostly descriptive, with limited examination of learning or assumptions.',
+      2: 'The response shows early reflection but needs deeper analysis of experience.',
+      3: 'The writer begins to examine experience as a source of learning and professional growth.',
+      4: 'Reflection is purposeful, structured, and connected to developing practice.',
+      5: 'The writer demonstrates advanced reflective practice with insight, evidence, and self-correction.'
+    },
+    transformative_reasoning: {
+      1: 'The response identifies ideas but does not yet show a shift in perspective.',
+      2: 'The writer begins to question assumptions but has not fully developed a transformed view.',
+      3: 'The response shows emerging perspective-shifting and meaning-making.',
+      4: 'The writer demonstrates clear transformation in thinking through critical interpretation.',
+      5: 'The response reflects mature transformative reasoning and a strongly reworked understanding.'
+    },
+    metacognitive_clarity: {
+      1: 'The writer has not yet made their thinking process visible.',
+      2: 'The response begins to show awareness of assumptions, choices, and learning moves.',
+      3: 'The writer demonstrates developing awareness of how they think and construct meaning.',
+      4: 'The response shows clear self-monitoring, intentional reasoning, and learning awareness.',
+      5: 'The writer demonstrates advanced metacognitive control and transparent scholarly reasoning.'
+    },
+    scholarly_voice: {
+      1: 'The writing remains mostly personal or general rather than scholarly in register.',
+      2: 'The response begins to move toward scholarly language but needs stronger conceptual positioning.',
+      3: 'The writer shows an emerging scholarly voice with some disciplinary framing.',
+      4: 'The response demonstrates confident scholarly positioning and appropriate academic register.',
+      5: 'The writer shows a mature doctoral voice with strong conceptual authority and disciplinary presence.'
+    }
+  };
 
+  const safeScore = Math.max(1, Math.min(5, Math.round(Number(score) || 1)));
+  return signals[key]?.[safeScore] || 'The response shows an emerging developmental signal in this dimension.';
+}
 function renderResults(r) {
   document.getElementById('session-tag').textContent = 'Session ' + sd.sessionId + ' · ' + sd.spec + ' · ' + sd.stage;
   const avg = (DIMS.reduce((s, d) => s + r[d.key].score, 0) / DIMS.length).toFixed(1);
@@ -496,8 +548,9 @@ function renderResults(r) {
     <div class="score-bar">
       <div class="score-fill" style="width:${pct}%"></div>
     </div>
-    <div class="dim-band">${r[d.key].band}</div>
-    <div class="dim-cite">${d.cite}</div>
+<div class="dim-band">${r[d.key].band}</div>
+<div class="dim-signal"><strong>Signal:</strong> ${getDimensionSignal(d.key, score)}</div>
+<div class="dim-cite">${d.cite}</div>
   </div>`;
 }).join('');
 
