@@ -331,19 +331,51 @@ async function submitResponse() {
    const cleaned = raw.replace(/```json|```/g, '').trim();
 const jsonStart = cleaned.indexOf('{');
 const jsonEnd = cleaned.lastIndexOf('}');
+
 if (jsonStart === -1 || jsonEnd === -1) {
+  console.error('Claude raw response:', cleaned);
   throw new Error('No JSON object returned from Claude.');
 }
-const result = JSON.parse(cleaned.slice(jsonStart, jsonEnd + 1));
-    sd.result = result;
-    renderResults(result);
-    showStep('step-results', 3);
-    sendEmail(result);
-  } catch(e) {
-    document.getElementById('status-writing').style.display = 'none';
-    document.getElementById('btn-submit').disabled = false;
-    alert('Error analyzing response. Please try again.');
-  }
+
+let jsonText = cleaned.slice(jsonStart, jsonEnd + 1);
+
+// Clean common Claude formatting issues
+jsonText = jsonText
+  .replace(/```json/gi, '')
+  .replace(/```/g, '')
+  .replace(/,\s*}/g, '}')
+  .replace(/,\s*]/g, ']')
+  .trim();
+
+let result;
+
+try {
+  result = JSON.parse(jsonText);
+} catch (parseError) {
+  console.error('JSON parse failed.');
+  console.error('Raw Claude response:', cleaned);
+  console.error('Extracted JSON text:', jsonText);
+  console.error(parseError);
+  throw new Error('Claude returned invalid JSON.');
+}
+
+sd.result = result;
+renderResults(result);
+showStep('step-results', 3);
+
+// Do not let email failure break the scoring screen
+try {
+  sendEmail(result);
+} catch (emailError) {
+  console.warn('Email failed, but results were created:', emailError);
+}
+
+} catch(e) {
+  console.error('Analyze response error:', e);
+  document.getElementById('status-writing').style.display = 'none';
+  document.getElementById('btn-submit').disabled = false;
+  alert('Error analyzing response: ' + e.message);
+}
 }
 
 function renderResults(r) {
