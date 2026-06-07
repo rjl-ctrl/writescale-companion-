@@ -328,7 +328,13 @@ async function submitResponse() {
     ).join(',\n');
     const sys = `You are a doctoral writing analyst using the WriteScale rubric. Score the student's response on five dimensions (1-5 each). Return ONLY a valid JSON object — no markdown, no preamble:\n{\n${dimSpec},\n"overall_narrative": "<3-4 sentence holistic summary addressing the student by first name, grounded in what they wrote, naming one concrete next step>"\n}`;
     const raw = await callClaude(sys, `Student: ${sd.name}. Specialization: ${sd.spec}. Stage: ${sd.stage}.\nPrompt: "${sd.prompt}"\nResponse: "${text}"`);
-    const result = JSON.parse(raw.replace(/```json|```/g, '').trim());
+   const cleaned = raw.replace(/```json|```/g, '').trim();
+const jsonStart = cleaned.indexOf('{');
+const jsonEnd = cleaned.lastIndexOf('}');
+if (jsonStart === -1 || jsonEnd === -1) {
+  throw new Error('No JSON object returned from Claude.');
+}
+const result = JSON.parse(cleaned.slice(jsonStart, jsonEnd + 1));
     sd.result = result;
     renderResults(result);
     showStep('step-results', 3);
