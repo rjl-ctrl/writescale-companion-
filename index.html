@@ -620,10 +620,15 @@ function setAssessmentMode(mode) {
 function renderTaskCard() {
   const label = document.getElementById('task-label');
   const text = document.getElementById('task-text');
-
+const partKicker = document.getElementById('part-kicker');
+const partTitle = document.getElementById('part-title');
+const partSubtitle = document.getElementById('part-subtitle');
   if (!label || !text || !currentMetaphorTask || !currentRevisionTask) return;
 
   if (assessmentMode === 'revision') {
+    partKicker.textContent = 'Part 2 of 2';
+partTitle.textContent = 'Problem Statement Revision';
+partSubtitle.textContent = 'Read the flawed doctoral-style problem statement below. Revise it into a clearer, stronger, research-aligned problem statement.';
     label.textContent = 'Revision challenge';
     text.innerHTML = `
       <strong>Problem passage:</strong><br>
@@ -633,6 +638,9 @@ function renderTaskCard() {
       ${currentRevisionTask.instruction}
     `;
   } else {
+    partKicker.textContent = 'Part 1 of 2';
+partTitle.textContent = 'Metaphor Response';
+partSubtitle.textContent = 'Use the metaphor prompt below to explain your thinking in a short scholarly response.';
     label.textContent = 'Writing prompt';
     text.textContent = currentMetaphorTask.text;
   }
