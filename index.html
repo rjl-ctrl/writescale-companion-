@@ -623,12 +623,14 @@ function renderTaskCard() {
 const partKicker = document.getElementById('part-kicker');
 const partTitle = document.getElementById('part-title');
 const partSubtitle = document.getElementById('part-subtitle');
+const rubricNote = document.getElementById('rubric-note');
   if (!label || !text || !currentMetaphorTask || !currentRevisionTask) return;
 
   if (assessmentMode === 'revision') {
     partKicker.textContent = 'Part 2 of 2';
 partTitle.textContent = 'Problem Statement Revision';
 partSubtitle.textContent = 'Read the flawed doctoral-style problem statement below. Revise it into a clearer, stronger, research-aligned problem statement.';
+rubricNote.textContent = 'Revise the passage into a concise doctoral-style problem statement. A strong problem statement is usually brief, focused, researchable, and specific rather than a full dissertation problem section.';    
     label.textContent = 'Revision challenge';
     text.innerHTML = `
       <strong>Problem passage:</strong><br>
@@ -641,6 +643,7 @@ partSubtitle.textContent = 'Read the flawed doctoral-style problem statement bel
     partKicker.textContent = 'Part 1 of 2';
 partTitle.textContent = 'Metaphor Response';
 partSubtitle.textContent = 'Use the metaphor prompt below to explain your thinking in a short scholarly response.';
+rubricNote.textContent = 'Write at least 150 words. There are no right or wrong answers — this assessment evaluates how you write, not what you know. Write as you naturally would in a scholarly paper.';    
     label.textContent = 'Writing prompt';
     text.textContent = currentMetaphorTask.text;
   }
