@@ -753,7 +753,19 @@ ${sd.revisionResponse || ''}`;
       `"${d.key}": { "score": <1-5>, "band": "<Emerging|Developing|Proficient|Advanced|Distinguished>", "feedback": "<2-3 sentences grounded in what they actually wrote, referencing ${d.cite}>" }`
     ).join(',\n');
 const activeTaskText = `Two-Part Writing Assessment`;
-    const sys = `You are a doctoral writing analyst using the WriteScale rubric. Score the student's response on five dimensions (1-5 each). Return ONLY a valid JSON object — no markdown, no preamble:\n{\n${dimSpec},\n"overall_narrative": "<3-4 sentence holistic summary addressing the student by first name, grounded in what they wrote, naming one concrete next step>"\n}`;
+ const sys = `You are a doctoral writing analyst using the WriteScale rubric.
+
+You must return ONLY a valid JSON object.
+Do not include markdown.
+Do not include explanations outside the JSON.
+Do not wrap the JSON in code fences.
+Do not use comments.
+Do not use trailing commas.
+All score values must be numbers from 1 to 5.
+All band values must be strings.
+All feedback values must be strings.
+
+Score the student's full two-part writing sample across five dimensions.`;
    const raw = await callClaude(sys, `Student: ${sd.name}. 
 Specialization: ${sd.spec}. 
 Stage: ${sd.stage}.
@@ -764,7 +776,7 @@ ${activeTaskText}
 Student response:
 ${sd.response}
 
-Return ONLY valid JSON with this structure:
+Return exactly this JSON structure and nothing else:
 {
   ${dimSpec},
   "overall_narrative": "A concise holistic summary of the student's writing, including strengths, growth edges, and one concrete next step."
