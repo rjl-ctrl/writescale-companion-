@@ -707,25 +707,44 @@ function startSession() {
 async function submitResponse() {
   const text = document.getElementById('f-response').value.trim();
   if (!text) return;
-  sd.response = text;
+if (assessmentMode === 'metaphor') {
+  sd.metaphorResponse = text;
+  assessmentMode = 'revision';
+
+  document.getElementById('f-response').value = '';
+  document.getElementById('char-count').textContent = '0 words';
+  document.getElementById('btn-submit').disabled = true;
+
+  renderTaskCard();
+  return;
+}
+
+sd.revisionResponse = text;
+sd.response = `Part 1: Metaphor Response
+
+Prompt:
+${currentMetaphorTask.text}
+
+Student response:
+${sd.metaphorResponse || ''}
+
+Part 2: Problem Statement Revision
+
+Problem passage:
+${currentRevisionTask.weakText}
+
+Instruction:
+${currentRevisionTask.instruction}
+
+Student revision:
+${sd.revisionResponse || ''}`;
   document.getElementById('btn-submit').disabled = true;
   document.getElementById('status-writing').style.display = 'flex';
   try {
     const dimSpec = DIMS.map(d =>
       `"${d.key}": { "score": <1-5>, "band": "<Emerging|Developing|Proficient|Advanced|Distinguished>", "feedback": "<2-3 sentences grounded in what they actually wrote, referencing ${d.cite}>" }`
     ).join(',\n');
-   const activeTaskText = assessmentMode === 'revision'
-  ? `Revision Challenge
-
-Problem passage:
-${currentRevisionTask.weakText}
-
-Instruction:
-${currentRevisionTask.instruction}`
-  : `Metaphor Response
-
-Prompt:
-${currentMetaphorTask.text}`;
+const activeTaskText = `Two-Part Writing Assessment`;
     const sys = `You are a doctoral writing analyst using the WriteScale rubric. Score the student's response on five dimensions (1-5 each). Return ONLY a valid JSON object — no markdown, no preamble:\n{\n${dimSpec},\n"overall_narrative": "<3-4 sentence holistic summary addressing the student by first name, grounded in what they wrote, naming one concrete next step>"\n}`;
    const raw = await callClaude(sys, `Student: ${sd.name}. 
 Specialization: ${sd.spec}. 
@@ -735,7 +754,7 @@ Current assessment mode and task:
 ${activeTaskText}
 
 Student response:
-${text}
+${sd.response}
 
 Return ONLY valid JSON with this structure:
 {
@@ -908,6 +927,10 @@ async function sendEmail(r) {
 
 function resetSession() {
   sd = {};
+  assessmentMode = 'metaphor';
+  currentMetaphorTask = null;
+  currentRevisionTask = null;
+
   ['f-name','f-spec','f-response'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('consent-check').checked = false;
   document.getElementById('btn-consent').disabled = true;
@@ -917,6 +940,8 @@ function resetSession() {
   document.getElementById('status-intake').style.display = 'none';
   document.getElementById('status-writing').style.display = 'none';
   document.getElementById('email-status').innerHTML = '';
+
+  refreshCurrentTask();
   showStep('step-consent', 0);
 }
  refreshCurrentTask();
