@@ -6,8 +6,33 @@
 <title>Doctoral WriteScale Companion</title>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9f9f9; color: #1a1a1a; min-height: 100vh; }
+:root {
+  --ink: #171717;
+  --paper: #f7f4ed;
+  --card: #ffffff;
+  --muted: #8d8a83;
+  --line: rgba(23, 23, 23, 0.09);
+  --accent: #c7a24a;
+  --accent-soft: #f3e7c0;
+  --scholar-blue: #2f435c;
+  --bar-dark: #1f1f1f;
+  --bar-warm: #8b7442;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(199, 162, 74, 0.10), transparent 34%),
+    linear-gradient(180deg, #fbfaf7 0%, var(--paper) 100%);
+  color: var(--ink);
+  min-height: 100vh;
+}
   .page { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
  .brand-header {
   display: flex;
@@ -17,32 +42,43 @@
 }
 
 .brand-mark {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #1a1a1a, #444);
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #242424 0%, #111 70%);
   color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 18px 35px rgba(0,0,0,0.18);
   position: relative;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
   flex-shrink: 0;
 }
 
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 7px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
 .brand-mark-main {
-  font-size: 25px;
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.08em;
+  line-height: 1;
 }
 
 .brand-mark-scale {
-  position: absolute;
-  right: 7px;
-  bottom: 4px;
-  font-size: 15px;
-  color: #d6b36a;
-  letter-spacing: -0.08em;
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 @media (max-width: 500px) {
@@ -112,7 +148,7 @@
 
 .score-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1a1a1a, #666);
+  background: linear-gradient(90deg, var(--bar-dark), var(--bar-warm));
   border-radius: 999px;
 }
   .dim-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
@@ -128,8 +164,8 @@
 }
 
 .dim-signal strong {
-  color: #333;
-  font-weight: 700;
+  color: var(--accent);
+  font-weight: 800;
 }
   .dim-cite { font-size: 11px; color: #aaa; font-style: italic; line-height: 1.4; }
   .feedback-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 10px; }
@@ -140,12 +176,88 @@
   .email-notice { font-size: 12px; color: #aaa; margin-top: 8px; }
   .email-ok { font-size: 13px; color: #555; background: #f0f7f0; border-radius: 8px; padding: 8px 12px; margin-top: 10px; border: 1px solid #d0e8d0; }
  .profile-card {
+ .mode-card,
+.task-card {
+  background: rgba(255,255,255,0.78);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 1.15rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.035);
+}
+
+.mode-title,
+.task-label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mode-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--ink);
+  transition: all 0.18s ease;
+}
+
+.mode-btn span {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.mode-btn.active {
+  border-color: rgba(199, 162, 74, 0.55);
+  background: linear-gradient(180deg, #fff 0%, var(--accent-soft) 160%);
+  box-shadow: 0 10px 24px rgba(199, 162, 74, 0.16);
+}
+
+.task-text {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #222;
+}
+
+.task-text strong {
+  color: var(--ink);
+} 
+.profile-card {
   margin: 22px 0 18px;
-  padding: 22px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, #ffffff 0%, #f7f7f5 100%);
-  border: 1px solid rgba(20, 20, 20, 0.08);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(250,248,242,0.98) 100%);
+  border: 1px solid var(--line);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.07);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card::before {
+  content: "";
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 0;
+  height: 4px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, var(--scholar-blue), var(--accent));
 }
 
 .profile-head {
@@ -205,7 +317,7 @@
 .profile-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #1f1f1f, #77736a);
+  background: linear-gradient(90deg, var(--bar-dark), var(--bar-warm));
 }
 
 .profile-score {
@@ -287,10 +399,24 @@
 
   <!-- STEP 3: WRITING -->
   <div class="step" id="step-writing">
-    <div class="card">
-      <div class="prompt-eyebrow">your writing prompt</div>
-      <div class="prompt-text" id="prompt-text"></div>
-    </div>
+<div class="mode-card">
+  <div class="mode-title">Assessment type</div>
+  <div class="mode-options">
+    <button class="mode-btn active" id="mode-metaphor" onclick="setAssessmentMode('metaphor')">
+      Metaphor Response
+      <span>Write from a doctoral prompt</span>
+    </button>
+    <button class="mode-btn" id="mode-revision" onclick="setAssessmentMode('revision')">
+      Revision Challenge
+      <span>Improve a weak scholarly passage</span>
+    </button>
+  </div>
+</div>
+
+<div class="task-card" id="task-card">
+  <div class="task-label" id="task-label">Writing prompt</div>
+  <div class="task-text" id="task-text"></div>
+</div>
     <div class="rubric-note">Write at least 150 words. There are no right or wrong answers — this assessment evaluates how you write, not what you know. Write as you naturally would in a scholarly paper.</div>
     <div class="field-group">
       <label class="field-label" for="f-response">Your response</label>
@@ -351,7 +477,108 @@ const DIMS = [
 ];
 
 let sd = {};
+const METAPHOR_TASKS = [
+  {
+    id: 'bridge',
+    text: 'Use the metaphor of a bridge to explain how you understand organizational leadership. In your response, explore what the metaphor reveals about connection, uncertainty, structure, and your own assumptions as an emerging doctoral scholar.'
+  },
+  {
+    id: 'compass',
+    text: 'Use the metaphor of a compass to explain how you understand organizational leadership. In your response, explore how leaders help people navigate ambiguity, values, direction, and competing demands.'
+  },
+  {
+    id: 'garden',
+    text: 'Use the metaphor of a garden to explain how you understand organizational leadership. In your response, explore growth, conditions, cultivation, patience, systems, and your own assumptions about developing people.'
+  },
+  {
+    id: 'orchestra',
+    text: 'Use the metaphor of an orchestra to explain how you understand organizational leadership. In your response, explore coordination, voice, timing, shared purpose, and the relationship between individual contribution and collective performance.'
+  },
+  {
+    id: 'lighthouse',
+    text: 'Use the metaphor of a lighthouse to explain how you understand organizational leadership. In your response, explore guidance, visibility, stability, risk, and how leaders support others during uncertainty.'
+  }
+];
 
+const REVISION_TASKS = [
+  {
+    id: 'leadership-basic',
+    weakText: 'Leadership is important because leaders help people do things. Good leaders are nice and make sure everyone works together. I think leadership means being responsible and helping people succeed.',
+    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing. Improve the conceptual clarity, organization, scholarly tone, and depth of reflection while preserving the original general meaning.'
+  },
+  {
+    id: 'change-basic',
+    weakText: 'Change is hard for organizations because people do not always like new things. Leaders need to explain the change and help people feel better about it. If everyone works together, the change can be successful.',
+    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about organizational change. Strengthen the conceptual framing, clarify the logic, and move beyond general statements.'
+  },
+  {
+    id: 'culture-basic',
+    weakText: 'Organizational culture is about how people act at work. Some workplaces are positive and some are negative. Leaders should try to make the culture better so employees are happier and do their jobs well.',
+    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about organizational culture. Improve the depth, precision, scholarly tone, and connection between culture, leadership, and organizational practice.'
+  },
+  {
+    id: 'ethics-basic',
+    weakText: 'Ethics are important in leadership because leaders should do the right thing. If leaders are honest, people will trust them. Bad leaders make poor choices and can hurt the organization.',
+    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about ethical leadership. Develop the conceptual reasoning, avoid simplistic claims, and preserve the original focus on trust and responsibility.'
+  },
+  {
+    id: 'communication-basic',
+    weakText: 'Communication matters because leaders have to tell people what is going on. When communication is bad, people get confused. Good communication helps everyone understand what they need to do.',
+    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about leadership communication. Strengthen the conceptual organization, scholarly voice, and explanation of why communication shapes organizational meaning.'
+  }
+];
+
+let assessmentMode = 'metaphor';
+let currentMetaphorTask = null;
+let currentRevisionTask = null;
+
+function chooseFreshTask(kind, tasks) {
+  const storageKey = `writescale-last-${kind}`;
+  const lastId = localStorage.getItem(storageKey);
+
+  let options = tasks.filter(t => t.id !== lastId);
+  if (!options.length) options = tasks;
+
+  const selected = options[Math.floor(Math.random() * options.length)];
+  localStorage.setItem(storageKey, selected.id);
+  return selected;
+}
+
+function refreshCurrentTask() {
+  currentMetaphorTask = chooseFreshTask('metaphor', METAPHOR_TASKS);
+  currentRevisionTask = chooseFreshTask('revision', REVISION_TASKS);
+  renderTaskCard();
+}
+
+function setAssessmentMode(mode) {
+  assessmentMode = mode;
+
+  document.getElementById('mode-metaphor').classList.toggle('active', mode === 'metaphor');
+  document.getElementById('mode-revision').classList.toggle('active', mode === 'revision');
+
+  renderTaskCard();
+}
+
+function renderTaskCard() {
+  const label = document.getElementById('task-label');
+  const text = document.getElementById('task-text');
+
+  if (!label || !text || !currentMetaphorTask || !currentRevisionTask) return;
+
+  if (assessmentMode === 'revision') {
+    label.textContent = 'Revision challenge';
+    text.innerHTML = `
+      <strong>Problem passage:</strong><br>
+      ${currentRevisionTask.weakText}
+      <br><br>
+      <strong>Your task:</strong><br>
+      ${currentRevisionTask.instruction}
+    `;
+  } else {
+    label.textContent = 'Writing prompt';
+    text.textContent = currentMetaphorTask.text;
+  }
+}
 function genId() {
   return 'WS-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
 }
@@ -394,24 +621,29 @@ async function callClaude(system, user) {
   return data.text;
 }
 
-async function startSession() {
-  const name  = document.getElementById('f-name').value.trim();
-  const spec  = document.getElementById('f-spec').value.trim();
+function startSession() {
+  const name = document.getElementById('f-name').value.trim();
+  const spec = document.getElementById('f-spec').value.trim();
   const stage = document.getElementById('f-stage').value;
-  if (!name || !spec) { alert('Please fill in your name and specialization.'); return; }
-  sd = { name, spec, stage, sessionId: genId() };
-  document.getElementById('btn-start').disabled = true;
-  document.getElementById('status-intake').style.display = 'flex';
-  try {
-    const sys = `You are the Doctoral WriteScale Companion. Generate a single metaphor-based writing prompt for a doctoral student. Ask them to explore a concept from their field through a metaphor or analogy, then develop that idea with scholarly language, reflecting on what it reveals about their scholarly identity and how they make meaning. 2-4 sentences. Output only the prompt text.`;
-    sd.prompt = await callClaude(sys, `Specialization: ${spec}. Stage: ${stage}. Name: ${name}.`);
-    document.getElementById('prompt-text').textContent = sd.prompt;
-    showStep('step-writing', 2);
-  } catch(e) {
-    document.getElementById('status-intake').style.display = 'none';
-    document.getElementById('btn-start').disabled = false;
-    alert('Error generating prompt. Please try again.');
+
+  if (!name || !spec) {
+    alert('Please fill in your name and specialization.');
+    return;
   }
+
+  sd = {
+    name,
+    spec,
+    stage,
+    sessionId: genId()
+  };
+
+  refreshCurrentTask();
+
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('status-intake').style.display = 'none';
+
+  showStep('step-writing', 2);
 }
 
 async function submitResponse() {
@@ -424,8 +656,34 @@ async function submitResponse() {
     const dimSpec = DIMS.map(d =>
       `"${d.key}": { "score": <1-5>, "band": "<Emerging|Developing|Proficient|Advanced|Distinguished>", "feedback": "<2-3 sentences grounded in what they actually wrote, referencing ${d.cite}>" }`
     ).join(',\n');
+   const activeTaskText = assessmentMode === 'revision'
+  ? `Revision Challenge
+
+Problem passage:
+${currentRevisionTask.weakText}
+
+Instruction:
+${currentRevisionTask.instruction}`
+  : `Metaphor Response
+
+Prompt:
+${currentMetaphorTask.text}`;
     const sys = `You are a doctoral writing analyst using the WriteScale rubric. Score the student's response on five dimensions (1-5 each). Return ONLY a valid JSON object — no markdown, no preamble:\n{\n${dimSpec},\n"overall_narrative": "<3-4 sentence holistic summary addressing the student by first name, grounded in what they wrote, naming one concrete next step>"\n}`;
-    const raw = await callClaude(sys, `Student: ${sd.name}. Specialization: ${sd.spec}. Stage: ${sd.stage}.\nPrompt: "${sd.prompt}"\nResponse: "${text}"`);
+   const raw = await callClaude(sys, `Student: ${sd.name}. 
+Specialization: ${sd.spec}. 
+Stage: ${sd.stage}.
+
+Current assessment mode and task:
+${activeTaskText}
+
+Student response:
+${text}
+
+Return ONLY valid JSON with this structure:
+{
+  ${dimSpec},
+  "overall_narrative": "A concise holistic summary of the student's writing, including strengths, growth edges, and one concrete next step."
+}`);
    const cleaned = raw.replace(/```json|```/g, '').trim();
 const jsonStart = cleaned.indexOf('{');
 const jsonEnd = cleaned.lastIndexOf('}');
@@ -603,6 +861,7 @@ function resetSession() {
   document.getElementById('email-status').innerHTML = '';
   showStep('step-consent', 0);
 }
+ refreshCurrentTask();
 </script>
 </body>
 </html>
