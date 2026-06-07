@@ -752,9 +752,9 @@ ${sd.revisionResponse || ''}`;
   document.getElementById('btn-submit').disabled = true;
   document.getElementById('status-writing').style.display = 'flex';
   try {
-    const dimSpec = DIMS.map(d =>
-      `"${d.key}": { "score": <1-5>, "band": "<Emerging|Developing|Proficient|Advanced|Distinguished>", "feedback": "<2-3 sentences grounded in what they actually wrote, referencing ${d.cite}>" }`
-    ).join(',\n');
+const dimSpec = DIMS.map(d =>
+  `"${d.key}": { "score": 3, "band": "Developing", "feedback": "Write 2 to 3 sentences grounded in the student response, naming one strength and one growth edge." }`
+).join(',\n');
 const activeTaskText = `Two-Part Writing Assessment`;
  const sys = `You are a doctoral writing analyst using the WriteScale rubric.
 
@@ -779,7 +779,7 @@ ${activeTaskText}
 Student response:
 ${sd.response}
 
-Return exactly this JSON structure and nothing else:
+Return exactly this valid JSON structure and nothing else. Replace the example scores, bands, and feedback with your actual assessment:
 {
   ${dimSpec},
   "overall_narrative": "A concise holistic summary of the student's writing, including strengths, growth edges, and one concrete next step."
