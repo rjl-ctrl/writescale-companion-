@@ -175,8 +175,50 @@ body {
   .session-tag { font-size: 12px; color: #aaa; margin-bottom: 6px; font-family: monospace; }
   .email-notice { font-size: 12px; color: #aaa; margin-top: 8px; }
   .email-ok { font-size: 13px; color: #555; background: #f0f7f0; border-radius: 8px; padding: 8px 12px; margin-top: 10px; border: 1px solid #d0e8d0; }
- .profile-card {
- .mode-card,
+  .part-card {
+  background: rgba(255,255,255,0.82);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.035);
+  position: relative;
+  overflow: hidden;
+}
+
+.part-card::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 0;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, var(--scholar-blue), var(--accent));
+}
+
+.part-kicker {
+  font-size: 12px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.part-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.part-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.mode-card,
 .task-card {
   background: rgba(255,255,255,0.78);
   border: 1px solid var(--line);
@@ -399,17 +441,11 @@ body {
 
   <!-- STEP 3: WRITING -->
   <div class="step" id="step-writing">
-<div class="mode-card">
-  <div class="mode-title">Assessment type</div>
-  <div class="mode-options">
-    <button class="mode-btn active" id="mode-metaphor" onclick="setAssessmentMode('metaphor')">
-      Metaphor Response
-      <span>Write from a doctoral prompt</span>
-    </button>
-    <button class="mode-btn" id="mode-revision" onclick="setAssessmentMode('revision')">
-      Revision Challenge
-      <span>Improve a weak scholarly passage</span>
-    </button>
+<div class="part-card" id="part-card">
+  <div class="part-kicker" id="part-kicker">Step 2</div>
+  <div class="part-title" id="part-title">Problem Statement Revision</div>
+  <div class="part-subtitle" id="part-subtitle">
+    Read the flawed doctoral-style problem statement below. Revise it into a clearer, stronger, research-aligned problem statement.
   </div>
 </div>
 
@@ -417,7 +453,7 @@ body {
   <div class="task-label" id="task-label">Writing prompt</div>
   <div class="task-text" id="task-text"></div>
 </div>
-    <div class="rubric-note">Write at least 150 words. There are no right or wrong answers — this assessment evaluates how you write, not what you know. Write as you naturally would in a scholarly paper.</div>
+   <div class="rubric-note" id="rubric-note">Write at least 150 words. There are no right or wrong answers — this assessment evaluates how you write, not what you know. Write as you naturally would in a scholarly paper.</div>
     <div class="field-group">
       <label class="field-label" for="f-response">Your response</label>
       <textarea id="f-response" placeholder="Begin writing here..." oninput="updateCount()"></textarea>
@@ -502,32 +538,32 @@ const METAPHOR_TASKS = [
 
 const REVISION_TASKS = [
   {
-    id: 'leadership-basic',
-    weakText: 'Leadership is important because leaders help people do things. Good leaders are nice and make sure everyone works together. I think leadership means being responsible and helping people succeed.',
-    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing. Improve the conceptual clarity, organization, scholarly tone, and depth of reflection while preserving the original general meaning.'
+    id: 'doctoral-problem-burnout',
+    weakText: `Many doctoral students experience stress and burnout because doctoral programs are very demanding. Students often have to balance school, work, family responsibilities, and personal challenges, which can make it hard for them to stay motivated and complete their programs. Universities should provide more support so students can feel encouraged and avoid dropping out. This is an important problem because doctoral education is difficult and students need help being successful.`,
+    instruction: `Revise this into a stronger dissertation-style problem statement. Clarify the specific problem, narrow the population and context, reduce solution language, strengthen the scholarly tone, and make the passage sound appropriate for doctoral-level research.`
   },
   {
-    id: 'change-basic',
-    weakText: 'Change is hard for organizations because people do not always like new things. Leaders need to explain the change and help people feel better about it. If everyone works together, the change can be successful.',
-    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about organizational change. Strengthen the conceptual framing, clarify the logic, and move beyond general statements.'
+    id: 'doctoral-problem-online-learning',
+    weakText: `Online learning has become very popular, but many students do not always feel connected to their instructors or classmates. This can make learning harder because students may feel isolated or unsupported. Instructors should use better communication, more videos, and interactive activities to help students feel more engaged. This problem matters because online education is now common and schools need to make it better for everyone.`,
+    instruction: `Revise this into a stronger dissertation-style problem statement. Focus on the research problem rather than proposed fixes, clarify the educational setting and learner population, and improve the precision, organization, and scholarly tone.`
   },
   {
-    id: 'culture-basic',
-    weakText: 'Organizational culture is about how people act at work. Some workplaces are positive and some are negative. Leaders should try to make the culture better so employees are happier and do their jobs well.',
-    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about organizational culture. Improve the depth, precision, scholarly tone, and connection between culture, leadership, and organizational practice.'
+    id: 'doctoral-problem-leadership-change',
+    weakText: `Organizational change is hard because employees usually do not like change. Leaders need to communicate better and help people understand why changes are happening. When leaders do not explain change well, employees may become frustrated, confused, or resistant. Organizations should train leaders to be more supportive during change. This is a problem because change happens all the time and leaders need to manage it successfully.`,
+    instruction: `Revise this into a stronger dissertation-style problem statement. Make the problem more researchable, avoid overgeneralized claims, clarify the organizational context, and strengthen the doctoral-level framing.`
   },
   {
-    id: 'ethics-basic',
-    weakText: 'Ethics are important in leadership because leaders should do the right thing. If leaders are honest, people will trust them. Bad leaders make poor choices and can hurt the organization.',
-    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about ethical leadership. Develop the conceptual reasoning, avoid simplistic claims, and preserve the original focus on trust and responsibility.'
+    id: 'doctoral-problem-counselor-training',
+    weakText: `Counseling students need to develop empathy so they can work well with clients. Some students struggle with empathy because they may not understand people who are different from them. Counselor education programs should teach empathy better and use more experiential activities. This is important because counselors need empathy to build relationships and help clients feel understood.`,
+    instruction: `Revise this into a stronger dissertation-style problem statement. Narrow the training context, clarify the gap or concern, avoid simply advocating for a solution, and strengthen the scholarly and professional tone.`
   },
   {
-    id: 'communication-basic',
-    weakText: 'Communication matters because leaders have to tell people what is going on. When communication is bad, people get confused. Good communication helps everyone understand what they need to do.',
-    instruction: 'Revise this passage so it demonstrates stronger doctoral-level writing about leadership communication. Strengthen the conceptual organization, scholarly voice, and explanation of why communication shapes organizational meaning.'
+    id: 'doctoral-problem-workplace-belonging',
+    weakText: `Employees need to feel like they belong at work. When people do not feel included, they may not be happy, productive, or loyal to the organization. Leaders should create a positive culture where everyone feels respected and supported. This is an important issue because workplaces are diverse and organizations need to make sure employees feel valued.`,
+    instruction: `Revise this into a stronger dissertation-style problem statement. Clarify the workplace problem, identify a more specific population or organizational context, reduce broad claims, and improve the research alignment and doctoral-level tone.`
   }
 ];
-
+  
 let assessmentMode = 'metaphor';
 let currentMetaphorTask = null;
 let currentRevisionTask = null;
